@@ -1,4 +1,3 @@
-
 import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, current_app
@@ -40,7 +39,7 @@ login_manager.login_message = 'Please login or register to interact with posts'
 # ========================
 # Database and Models
 # ========================
-DB_PATH = 'gallery.db'
+DB_PATH = 'instance/gallery.db'
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

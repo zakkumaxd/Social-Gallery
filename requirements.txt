@@ -1,7 +1,7 @@
-Flask
-Flask-Login
-Flask-WTF
-WTForms
-bcrypt
-Pillow
-Werkzeug
+bcrypt==5.0.0
+Flask==2.3.3
+Flask-Login==0.6.3
+Flask-WTF==1.1.1
+Pillow==12.1.0
+Werkzeug==2.3.8
+WTForms==3.2.1
