@@ -502,3 +502,69 @@ textarea:focus {
         padding: 0 10px;
     }
 }
+
+/* ==================== PROFILE DROPDOWN ==================== */
+.profile-dropdown {
+    position: relative;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 30px;
+    background: #121212;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.profile:hover {
+    background: #1a1a1a;
+}
+
+.profile .user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dropdown-arrow {
+    color: #6b6b6b;
+    font-size: 12px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    background: #121212;
+    border: 1px solid #2c2c2c;
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    z-index: 100;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #e0e0e0;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdown-menu a:hover {
+    background: #1a1a1a;
+    color: #1da1f2;
+}
+
+.dropdown-menu a:first-child {
+    border-bottom: 1px solid #2c2c2c;
+}

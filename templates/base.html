@@ -19,6 +19,31 @@
                 <a href="{{ url_for('saved_posts') }}">Bookmarks</a>
                 {% if current_user.is_authenticated %}
                     <a href="{{ url_for('my_posts') }}">My Posts</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-dropdown">
+            <div class="profile" onclick="toggleDropdown()">
+                <div class="user">
+                    <div class="avatar"></div>
+                    <div>
+                        {% if current_user.is_authenticated %}
+                            <div>{{ current_user.username }}</div>
+                            <small>@{{ current_user.username }}</small>
+                        {% else %}
+                            <div>Guest</div>
+                            <small>@guest</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="dropdown-arrow">▼</div>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                {% if current_user.is_authenticated %}
                     <a href="{{ url_for('profile', username=current_user.username) }}">Profile</a>
                     <a href="{{ url_for('logout') }}">Logout</a>
                 {% else %}
@@ -27,21 +52,8 @@
                 {% endif %}
             </div>
         </div>
-        <div class="profile">
-            <div class="user">
-                <div class="avatar"></div>
-                <div>
-                    {% if current_user.is_authenticated %}
-                        <div>{{ current_user.username }}</div>
-                        <small>@{{ current_user.username }}</small>
-                    {% else %}
-                        <div>Guest</div>
-                        <small>@guest</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
     </div>
+
     <div class="main">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% for category, message in messages %}
@@ -50,6 +62,24 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function toggleDropdown() {
+            var menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile') && !event.target.closest('.profile')) {
+                var dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (var i = 0; i < dropdowns.length; i++) {
+                    if (dropdowns[i].classList.contains('show')) {
+                        dropdowns[i].classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
