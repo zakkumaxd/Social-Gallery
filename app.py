@@ -28,6 +28,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs('instance', exist_ok=True)
 os.makedirs('static/css', exist_ok=True)
 os.makedirs('static/js', exist_ok=True)
 
