@@ -1,0 +1,504 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    background: #0a0a0a;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar {
+    width: 280px;
+    background: #000000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    border-right: 1px solid #2c2c2c;
+    position: fixed;
+    height: 100vh;
+}
+
+.search input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 30px;
+    border: 1px solid #2c2c2c;
+    background: #121212;
+    color: white;
+    font-size: 14px;
+}
+
+.search input:focus {
+    outline: none;
+    border-color: #1da1f2;
+}
+
+.search input::placeholder {
+    color: #6b6b6b;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #e0e0e0;
+    padding: 12px 16px;
+    font-size: 18px;
+    border-radius: 30px;
+    transition: all 0.2s;
+}
+
+.menu a:hover {
+    background: #1a1a1a;
+    color: #1da1f2;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 30px;
+    margin-top: 20px;
+    background: #121212;
+}
+
+.profile .user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+}
+
+.profile .user div div {
+    color: white;
+    font-weight: bold;
+}
+
+.profile .user small {
+    color: #6b6b6b;
+    font-size: 12px;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+.main {
+    margin-left: 280px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #0a0a0a;
+}
+
+.feed {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Flash Messages */
+.flash {
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.flash.success {
+    background: #1e4620;
+    color: #8bc34a;
+    border: 1px solid #2e7d32;
+}
+
+.flash.error {
+    background: #5c1a1a;
+    color: #ff8a80;
+    border: 1px solid #c62828;
+}
+
+/* ==================== CARDS ==================== */
+.card {
+    background: #121212;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #2c2c2c;
+    overflow: hidden;
+    
+}
+
+.username {
+    padding: 16px 20px 8px 20px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.username a {
+    text-decoration: none;
+    color: #e0e0e0;
+}
+
+.username a:hover {
+    text-decoration: underline;
+    color: #1da1f2;
+}
+
+/* Post Box */
+.post-box {
+    margin: 0 20px 15px 20px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #1a1a1a;
+}
+
+.post-box img {
+    width: 100%;
+    display: block;
+    max-height: 600px;
+    object-fit: contain;
+    background: #0a0a0a;
+}
+
+.post-caption {
+    padding: 12px 16px;
+    color: #d0d0d0;
+    font-size: 14px;
+}
+
+/* Upload Form */
+.upload-card {
+    margin-bottom: 30px;
+}
+
+.upload-box {
+    padding: 16px 20px;
+}
+
+.upload-box input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    background: #1a1a1a;
+    border: 1px dashed #3a3a3a;
+    border-radius: 12px;
+    color: #e0e0e0;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.upload-box input[type="file"]:hover {
+    border-color: #1da1f2;
+}
+
+.upload-box input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    border: 1px solid #2c2c2c;
+    background: #1a1a1a;
+    color: white;
+}
+
+.upload-box input[type="text"]:focus {
+    outline: none;
+    border-color: #1da1f2;
+}
+
+/* Action Buttons */
+.actions {
+    padding: 0 20px 16px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+button {
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: none;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: #2a2a2a;
+}
+
+.like-btn.liked {
+    color: #ff4d4d;
+}
+
+.save-btn {
+    background: #1a1a1a;
+}
+
+.delete-form {
+    display: inline;
+}
+
+.delete-form button {
+    background: #2a1215;
+    color: #ff6b6b;
+}
+
+.delete-form button:hover {
+    background: #3a1818;
+}
+
+/* ==================== COMMENTS ==================== */
+.comments-section {
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid #2c2c2c;
+    margin-top: 0;
+    padding-top: 16px;
+}
+
+.comments-section form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.comments-section input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 30px;
+    border: 1px solid #2c2c2c;
+    background: #1a1a1a;
+    color: white;
+}
+
+.comments-section input:focus {
+    outline: none;
+    border-color: #1da1f2;
+}
+
+.comments-section button {
+    padding: 8px 20px;
+}
+
+.comment {
+    background: #1a1a1a;
+    padding: 10px 14px;
+    border-radius: 16px;
+    margin-bottom: 8px;
+}
+
+.comment strong {
+    color: #1da1f2;
+    font-size: 13px;
+}
+
+.comment p {
+    color: #d0d0d0;
+    margin-top: 4px;
+}
+
+/* ==================== AUTH PAGES ==================== */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.auth-container .card {
+    width: 500px;
+    text-align: center;
+    padding: 30px;
+}
+
+.auth-container h2 {
+    color: white;
+    margin-bottom: 24px;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 30px;
+    border: 1px solid #2c2c2c;
+    background: #1a1a1a;
+    color: white;
+    font-size: 15px;
+}
+
+.auth-container input:focus {
+    outline: none;
+    border-color: #1da1f2;
+}
+
+.auth-container button {
+    width: 100%;
+    padding: 12px;
+    background: #1da1f2;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.auth-container button:hover {
+    background: #0d8bd9;
+}
+
+.auth-container p {
+    margin-top: 20px;
+    color: #6b6b6b;
+}
+
+.auth-container a {
+    color: #1da1f2;
+    text-decoration: none;
+}
+
+/* ==================== PROFILE PAGE ==================== */
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    text-align: center;
+    padding: 30px !important;
+}
+
+.avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+    margin: 0 auto 16px;
+}
+
+.profile-card h2 {
+    color: white;
+    font-size: 24px;
+}
+
+.profile-card small {
+    color: #6b6b6b;
+    display: block;
+    margin-top: 4px;
+}
+
+.profile-card p {
+    color: #d0d0d0;
+    margin: 16px 0;
+}
+
+.edit-btn {
+    display: inline-block;
+    padding: 8px 24px;
+    background: #1a1a1a;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 14px;
+}
+
+.edit-btn:hover {
+    background: #2a2a2a;
+}
+
+/* Posts Grid */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.grid-card {
+    background: #121212;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #2c2c2c;
+}
+
+.grid-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.grid-actions {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #b0b0b0;
+    font-size: 13px;
+}
+
+.grid-actions button {
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+/* Edit Profile */
+textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid #2c2c2c;
+    background: #1a1a1a;
+    color: white;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #1da1f2;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+        padding: 16px 10px;
+    }
+    
+    .search input,
+    .profile .user div,
+    .menu a {
+        display: none;
+    }
+    
+    .main {
+        margin-left: 80px;
+    }
+    
+    .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .feed {
+        padding: 0 10px;
+    }
+}

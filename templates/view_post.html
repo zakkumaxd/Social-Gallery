@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="feed">
+    <div class="card">
+        <div class="username">
+            <a href="{{ url_for('profile', username=post['username']) }}">@{{ post['username'] }}</a>
+        </div>
+        <div class="post-box">
+            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
+            <div class="post-caption">{{ post['caption'] }}</div>
+        </div>
+        <div class="actions">
+            <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
+            <button class="save-btn" data-id="{{ post['id'] }}">Save</button>
+        </div>
+        <div class="comments-section">
+            <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">
+                <input type="text" name="content" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+            </form>
+            {% for comment in comments %}
+            <div class="comment">
+                <strong>@{{ comment['username'] }}</strong>
+                <p>{{ comment['content'] }}</p>
+            </div>
+            {% else %}
+            <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

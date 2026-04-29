@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="card profile-card">
+        <div class="avatar-large"></div>
+        <h2>{{ profile_user['username'] }}</h2>
+        <small>@{{ profile_user['username'] }}</small>
+        <p>{{ profile_user['bio'] or 'No bio yet.' }}</p>
+        {% if is_own_profile %}
+            <a href="{{ url_for('edit_profile') }}" class="edit-btn">Edit Profile</a>
+        {% endif %}
+    </div>
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="grid-card">
+            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
+            <div class="grid-actions">
+                <span>{{ post['like_count'] }} likes</span>
+                <span>{{ post['comment_count'] }} comments</span>
+            </div>
+        </div>
+        {% else %}
+        <p>No posts yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="feed">
+    {% if current_user.is_authenticated %}
+    <div class="card">
+        <div class="username">@{{ current_user.username }}</div>
+        <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="post-box">
+                <input type="file" name="image" accept="image/*" required>
+                <input type="text" name="caption" placeholder="Write a caption...">
+            </div>
+            <div class="actions">
+                <button type="submit">Post</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% for post in posts %}
+    <div class="card">
+        <div class="username">
+            <a href="{{ url_for('profile', username=post['username']) }}">@{{ post['username'] }}</a>
+        </div>
+        <div class="post-box">
+            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
+            <div class="post-caption">{{ post['caption'] }}</div>
+        </div>
+        <div class="actions">
+            <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
+            <button class="comment-btn" data-id="{{ post['id'] }}">Comment</button>
+            {% if current_user.is_authenticated and current_user.id == post['owner_id'] %}
+            <form action="{{ url_for('delete_post', post_id=post['id']) }}" method="POST">
+                <button type="submit" onclick="return confirm('Delete this post?')">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="comments-section" id="comments-{{ post['id'] }}" style="display: none;">
+            <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">
+                <input type="text" name="content" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <p>No posts yet. Be the first to share!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
