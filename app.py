@@ -306,7 +306,7 @@ def add_comment(post_id):
             (content, current_user.id, post_id)
         )
     flash('Comment added!', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('view_post', post_id=post_id))
 
 @app.route('/save/<int:post_id>', methods=['POST'])
 @login_required

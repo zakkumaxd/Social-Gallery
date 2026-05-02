@@ -20,7 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/save/${postId}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
-                    this.innerHTML = data.saved ? 'Saved' : 'Save';
+                    if (data.saved) {
+                        this.innerHTML = 'Saved';
+                        this.style.color = 'green';
+                    } else {
+                        this.innerHTML = 'Save';
+                        this.style.color = '';
+                    }
                 });
         });
     });

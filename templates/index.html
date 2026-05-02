@@ -23,17 +23,26 @@
             <a href="{{ url_for('profile', username=post['username']) }}">@{{ post['username'] }}</a>
         </div>
         <div class="post-box">
-            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
+            <a href="{{url_for('view_post', post_id=post['id'])}}">
+                <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
+            </a>
             <div class="post-caption">{{ post['caption'] }}</div>
         </div>
         <div class="actions">
             <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
-            <button class="comment-btn" data-id="{{ post['id'] }}">Comment</button>
-            {% if current_user.is_authenticated and current_user.id == post['owner_id'] %}
+            <button class="comment-btn" data-id="{{ post['id'] }}">Comment {{ post['comment_count'] }}</button>
+            <button class="save-btn {% if post['id'] in saved_posts %}saved{% endif %}" data-id="{{ post['id'] }}">
+                {% if post['id'] in saved_posts %}
+                    Saved
+                {% else %}
+                    Save
+                {% endif %}
+            </button>
+            <!-- {% if current_user.is_authenticated and current_user.id == post['owner_id'] %}
             <form action="{{ url_for('delete_post', post_id=post['id']) }}" method="POST">
                 <button type="submit" onclick="return confirm('Delete this post?')">Delete</button>
             </form>
-            {% endif %}
+            {% endif %} -->
         </div>
         <div class="comments-section" id="comments-{{ post['id'] }}" style="display: none;">
             <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">

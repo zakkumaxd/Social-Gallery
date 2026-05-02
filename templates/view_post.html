@@ -12,7 +12,13 @@
         </div>
         <div class="actions">
             <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
-            <button class="save-btn" data-id="{{ post['id'] }}">Save</button>
+            <button class="save-btn {% if post['id'] in saved_posts %}saved{% endif %}" data-id="{{ post['id'] }}">
+                {% if post['id'] in saved_posts %}
+                    Saved
+                {% else %}
+                    Save
+                {% endif %}
+            </button>
         </div>
         <div class="comments-section">
             <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">
@@ -22,7 +28,8 @@
             {% for comment in comments %}
             <div class="comment">
                 <strong>@{{ comment['username'] }}</strong>
-                <p>{{ comment['content'] }}</p>
+                <p>{{ comment['content'] }}</p> 
+                <!--<small>{{ comment['created_at']}}</small>-->
             </div>
             {% else %}
             <p>No comments yet.</p>
