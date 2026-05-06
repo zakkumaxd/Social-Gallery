@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Search Results - Social Gallery{% endblock %}
+{% block title %}#{{ tag_name }} - Social Gallery{% endblock %}
+{% block page_title %}#{{ tag_name }}{% endblock %}
 
 {% block content %}
 <button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
@@ -8,19 +9,21 @@
 </button>
 <div class="profile-container">
     <h2 style="margin-bottom: 20px;">
-        <i class="fas fa-search"></i> Results for "{{ query }}"
+        <i class="fas fa-hashtag"></i> {{ tag_name }}
     </h2>
     
     {% if posts %}
+    <p style="color: var(--text-muted); margin-bottom: 20px;">{{ posts|length }} post(s)</p>
+    
     <div class="posts-grid">
         {% for post in posts %}
         <div class="grid-card">
             <a href="{{ url_for('view_post', post_id=post.id) }}">
                 <div class="grid-media">
                     {% if post.media_type == 'image' and post.media_filename %}
-                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post" loading="lazy">
+                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post image" loading="lazy">
                     {% elif post.media_type == 'video' and post.media_filename %}
-                        <video preload="metadata" poster="">
+                        <video preload="metadata">
                             <source src="{{ url_for('static', filename='uploads/videos/' + post.media_filename) }}" type="video/webm">
                         </video>
                     {% elif post.media_type == 'gif' and post.media_filename %}
@@ -28,26 +31,31 @@
                     {% elif post.content %}
                         <div class="text-preview">
                             <i class="fas fa-file-alt"></i>
-                            <p>{{ post.content_highlighted|safe if post.content_highlighted else post.preview|safe }}</p>
+                            <p>{{ post.preview | safe }}</p>
                         </div>
                     {% else %}
-                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary); color: var(--text-muted);">
-                            <i class="fas fa-file-alt" style="font-size: 48px;"></i>
+                        <div class="text-preview">
+                            <i class="fas fa-file-alt"></i>
                         </div>
                     {% endif %}
                 </div>
             </a>
             <div class="grid-info">
-                <a href="{{ url_for('profile', username=post.username) }}" style="color: var(--text-primary); text-decoration: none;">@{{ post.username }}</a>
+                <a href="{{ url_for('profile', username=post.username) }}" style="color: var(--text-primary); text-decoration: none; font-size: 14px;">@{{ post.username }}</a>
+                <div class="grid-stats">
+                    <span><i class="fas fa-heart"></i> {{ post.like_count }}</span>
+                    <span><i class="fas fa-comment"></i> {{ post.comment_count }}</span>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="card text-center" style="padding: 60px;">
-        <i class="fas fa-search" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
-        <p>No results found for "{{ query }}"</p>
-        <a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 16px; color: var(--brand);">← Back to home</a>
+    <div class="card empty-state">
+        <i class="fas fa-hashtag"></i>
+        <h3>No posts with this tag yet</h3>
+        <p>Be the first to use #{{ tag_name }}!</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Create a post →</a>
     </div>
     {% endif %}
 </div>

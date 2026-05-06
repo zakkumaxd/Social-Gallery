@@ -1,24 +1,66 @@
 {% extends "base.html" %}
 
+{% block title %}My Posts - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="profile-container">
-    <h2 style="color: white; margin-bottom: 20px;">My Posts</h2>
+    <h2 style="margin-bottom: 20px;"><i class="fas fa-user"></i> My Posts ({{ posts|length }}/500)</h2>
+    
     <div class="posts-grid">
         {% for post in posts %}
         <div class="grid-card">
-            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
-            <div class="grid-actions">
-                <span>{{ post['like_count'] }} likes</span>
-                <span>{{ post['comment_count'] }} comments</span>
-                <form action="{{ url_for('delete_post', post_id=post['id']) }}" method="POST" style="display: inline;">
-                    <button type="submit" onclick="return confirm('Delete this post?')">Delete</button>
-                </form>
+            <a href="{{ url_for('view_post', post_id=post.id) }}">
+                <div class="grid-media">
+                    {% if post.media_type == 'image' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post" loading="lazy">
+                    {% elif post.media_type == 'video' and post.media_filename %}
+                        <video preload="metadata" poster="">
+                            <source src="{{ url_for('static', filename='uploads/videos/' + post.media_filename) }}" type="video/webm">
+                        </video>
+                    {% elif post.media_type == 'gif' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/gifs/' + post.media_filename) }}" alt="GIF" loading="lazy">
+                    {% elif post.content %}
+                        <div class="text-preview">
+                            <i class="fas fa-file-alt"></i>
+                            <p>{{ post.preview|safe }}</p>
+                        </div>
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary); color: var(--text-muted);">
+                            <i class="fas fa-file-alt" style="font-size: 48px;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </a>
+ <div class="grid-info">
+            <div class="grid-stats">
+                <span><i class="fas fa-heart"></i> {{ post.like_count }}</span>
+                <span><i class="fas fa-comment"></i> {{ post.comment_count }}</span>
+            </div>
+            <div class="post-menu" style="position: relative;">
+                <button type="button" class="post-menu-trigger" data-menu-id="mypost-menu-{{ post.id }}">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="post-menu-dropdown" id="mypost-menu-{{ post.id }}" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;">
+                    <a href="{{ url_for('view_post', post_id=post.id) }}">
+                        <i class="fas fa-external-link-alt"></i> View post
+                    </a>
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                        <button type="button" class="delete-post-btn btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+        </div>
         {% else %}
-        <div class="card" style="padding: 40px; text-align: center;">
-            <p style="color: #6b6b6b;">You haven't posted anything yet.</p>
-            <a href="{{ url_for('index') }}" style="color: #1da1f2; text-decoration: none;">Upload your first post →</a>
+        <div class="card text-center" style="grid-column: 1/-1; padding: 60px;">
+            <i class="fas fa-camera" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+            <p>You haven't posted anything yet.</p>
+            <a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 16px; padding: 10px 24px; background: var(--brand); color: white; border-radius: var(--radius); text-decoration: none;">Create your first post →</a>
         </div>
         {% endfor %}
     </div>

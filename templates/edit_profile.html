@@ -1,14 +1,64 @@
 {% extends "base.html" %}
 
+{% block title %}Edit Profile - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="auth-container">
-    <div class="card">
-        <h2>Edit Profile</h2>
-        <form method="POST">
-            <textarea name="bio" placeholder="Tell us about yourself..." rows="4">{{ current_user.bio or '' }}</textarea>
-            <button type="submit">Save Changes</button>
+    <div class="card auth-card">
+        <h2><i class="fas fa-user-edit"></i> Edit Profile</h2>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="avatar-large" style="margin-bottom: 10px;">
+                    {% if current_user.avatar_filename %}
+                        <img src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar_filename) }}" alt="Avatar">
+                    {% else %}
+                        <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4f46e5); margin: 0 auto;"></div>
+                    {% endif %}
+                </div>
+                <label for="avatar" style="cursor: pointer; color: var(--brand);">
+                    <i class="fas fa-camera"></i> Change Avatar
+                </label>
+                <input type="file" name="avatar" id="avatar" accept="image/*" style="display: none;">
+            </div>
+            
+            <textarea name="bio" placeholder="Tell us about yourself..." rows="4" style="width: 100%; padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-primary);">{{ current_user.bio or '' }}</textarea>
+            
+            <button type="submit" style="margin-top: 20px;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
         </form>
-        <a href="{{ url_for('profile', username=current_user.username) }}">Cancel</a>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('profile', username=current_user.username) }}" style="color: var(--text-muted);">← Back to Profile</a>
+        </p>
     </div>
 </div>
+
+<script>
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.querySelector('.avatar-large img, .avatar-large div');
+                if (img.tagName === 'DIV') {
+                    const newImg = document.createElement('img');
+                    newImg.style.width = '120px';
+                    newImg.style.height = '120px';
+                    newImg.style.borderRadius = '50%';
+                    newImg.style.objectFit = 'cover';
+                    img.parentNode.replaceChild(newImg, img);
+                    newImg.src = e.target.result;
+                } else {
+                    img.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 {% endblock %}

@@ -1,27 +1,107 @@
 {% extends "base.html" %}
 
+{% block title %}{{ profile_user.username }} - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="profile-container">
     <div class="card profile-card">
-        <div class="avatar-large"></div>
-        <h2>{{ profile_user['username'] }}</h2>
-        <small>@{{ profile_user['username'] }}</small>
-        <p>{{ profile_user['bio'] or 'No bio yet.' }}</p>
-        {% if is_own_profile %}
-            <a href="{{ url_for('edit_profile') }}" class="edit-btn">Edit Profile</a>
+        <div class="avatar-large">
+            {% if profile_user.avatar_filename %}
+                <img src="{{ url_for('static', filename='uploads/avatars/' + profile_user.avatar_filename) }}" alt="{{ profile_user.username }}">
+            {% else %}
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4f46e5); margin: 0 auto;"></div>
+            {% endif %}
+        </div>
+        <h2>{{ profile_user.username }}</h2>
+        <small>@{{ profile_user.username }}</small>
+        
+        <div class="profile-stats">
+            <div class="stat">
+                <span class="stat-number">{{ posts|length }}</span>
+                <span class="stat-label">posts</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" id="follower-count">{{ follower_count }}</span>
+                <span class="stat-label">followers</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" id="following-count">{{ following_count }}</span>
+                <span class="stat-label">following</span>
+            </div>
+        </div>
+        
+        <p class="profile-bio">{{ profile_user.bio or 'No bio yet.' }}</p>
+        
+        {% if current_user.is_authenticated %}
+            {% if not is_own_profile %}
+            <button class="follow-btn btn btn-primary" data-user-id="{{ profile_user.id }}" style="background: {% if is_following %}var(--bg-tertiary){% else %}var(--brand){% endif %};">
+                    {% if is_following %}Unfollow{% else %}Follow{% endif %}
+                </button>
+            {% else %}
+            <a href="{{ url_for('edit_profile') }}" class="edit-btn btn btn-outline">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+            {% endif %}
         {% endif %}
     </div>
+    
     <div class="posts-grid">
         {% for post in posts %}
         <div class="grid-card">
-            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
-            <div class="grid-actions">
-                <span>{{ post['like_count'] }} likes</span>
-                <span>{{ post['comment_count'] }} comments</span>
+            <a href="{{ url_for('view_post', post_id=post.id) }}">
+                <div class="grid-media">
+                    {% if post.media_type == 'image' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post" loading="lazy">
+                    {% elif post.media_type == 'video' and post.media_filename %}
+                        <video preload="metadata" poster="">
+                            <source src="{{ url_for('static', filename='uploads/videos/' + post.media_filename) }}" type="video/webm">
+                        </video>
+                    {% elif post.media_type == 'gif' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/gifs/' + post.media_filename) }}" alt="GIF" loading="lazy">
+                    {% elif post.content %}
+                        <div class="text-preview">
+                            <i class="fas fa-file-alt"></i>
+                            <p>{{ post.preview|safe }}</p>
+                        </div>
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary); color: var(--text-muted);">
+                            <i class="fas fa-file-alt" style="font-size: 48px;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </a>
+            <div class="grid-info">
+                <div class="grid-stats">
+                    <span><i class="fas fa-heart"></i> {{ post.like_count }}</span>
+                    <span><i class="fas fa-comment"></i> {{ post.comment_count }}</span>
+                </div>
+                {% if is_own_profile %}
+                <div class="post-menu">
+                    <button type="button" class="post-menu-trigger" data-menu-id="profile-post-menu-{{ post.id }}">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="post-menu-dropdown" id="profile-post-menu-{{ post.id }}">
+                        <a href="{{ url_for('view_post', post_id=post.id) }}">
+                            <i class="fas fa-external-link-alt"></i> View post
+                        </a>
+                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                            <button type="button" class="delete-post-btn btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% else %}
-        <p>No posts yet.</p>
+        <div class="card text-center" style="grid-column: 1/-1; padding: 60px;">
+            <i class="fas fa-camera" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+            <p>No posts yet.</p>
+        </div>
         {% endfor %}
     </div>
 </div>

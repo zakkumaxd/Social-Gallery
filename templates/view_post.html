@@ -1,39 +1,158 @@
 {% extends "base.html" %}
 
+{% block title %}Post by @{{ post.username }} - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="feed">
-    <div class="card">
-        <div class="username">
-            <a href="{{ url_for('profile', username=post['username']) }}">@{{ post['username'] }}</a>
+    <div class="card post-detail-card">
+        <!-- Post Header -->
+        <div class="card-header">
+            <div class="post-author">
+                <a href="{{ url_for('profile', username=post.username) }}">
+                    <div class="avatar">
+                        {% if post.avatar_filename %}
+                            <img src="{{ url_for('static', filename='uploads/avatars/' + post.avatar_filename) }}" alt="{{ post.username }}">
+                        {% else %}
+                            <div class="avatar-placeholder"></div>
+                        {% endif %}
+                    </div>
+                    <div class="post-author-info">
+                        <h4>@{{ post.username }}</h4>
+                        <time datetime="{{ post.created_at }}">{{ post.created_at | timeago }}</time>
+                    </div>
+                </a>
+            </div>
+            <div class="post-menu">
+                <button type="button" class="post-menu-trigger" data-menu-id="post-menu-{{ post.id }}" aria-label="Post options">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="post-menu-dropdown" id="post-menu-{{ post.id }}">
+                    <a href="{{ url_for('profile', username=post.username) }}">
+                        <i class="fas fa-user"></i> View profile
+                    </a>
+                    {% if current_user.is_authenticated and current_user.id == post.owner_id %}
+                    
+                    <button type="button" class="edit-post-trigger btn btn-outline" data-id="{{ post.id }}">
+                        <i class="fas fa-edit"></i> Edit post
+                    </button>
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                        <button type="button" class="delete-post-btn btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete post
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="post-box">
-            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
-            <div class="post-caption">{{ post['caption'] }}</div>
+        
+        <!-- Edit Post Form (hidden by default) -->
+        {% if current_user.is_authenticated and current_user.id == post.owner_id %}
+        <div class="edit-post-form" id="edit-post-form-{{ post.id }}">
+            <form action="{{ url_for('edit_post', post_id=post.id) }}" method="POST">
+                <textarea name="content" rows="6">{{ post.content | safe if post.content else '' }}</textarea>
+                <div class="edit-post-actions">
+                    <button type="submit" class="save-edit-btn btn btn-primary">Save changes</button>
+                    <button type="button" class="cancel-edit-post btn btn-outline">Cancel</button>
+                </div>
+            </form>
         </div>
-        <div class="actions">
-            <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
-            <button class="save-btn {% if post['id'] in saved_posts %}saved{% endif %}" data-id="{{ post['id'] }}">
-                {% if post['id'] in saved_posts %}
-                    Saved
-                {% else %}
-                    Save
+        {% endif %}
+        
+        <!-- Post Content -->
+        <div class="post-content" id="post-content-{{ post.id }}">
+            {% if post.content %}
+            <div class="post-text">
+                {{ post.content | safe }}
+            </div>
+            {% endif %}
+            
+            {% if post.media_filename %}
+            <div class="post-media">
+                {% if post.media_type == 'image' %}
+                    <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post image" loading="lazy">
+                {% elif post.media_type == 'gif' %}
+                    <img src="{{ url_for('static', filename='uploads/gifs/' + post.media_filename) }}" alt="GIF">
                 {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Post Actions -->
+        <div class="post-actions">
+            <button class="action-btn like-btn {% if liked %}liked{% endif %}" data-id="{{ post.id }}" aria-label="Like">
+                <i class="{% if liked %}fas{% else %}far{% endif %} fa-heart"></i>
+                <span class="like-count">{{ post.like_count }}</span>
+            </button>
+            <button class="action-btn save-btn {% if saved %}saved{% endif %}" data-id="{{ post.id }}" aria-label="Save">
+                <i class="{% if saved %}fas{% else %}far{% endif %} fa-bookmark"></i>
+                <span>{% if saved %}Saved{% else %}Save{% endif %}</span>
             </button>
         </div>
+        
+        <!-- Comments Section -->
         <div class="comments-section">
-            <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">
-                <input type="text" name="content" placeholder="Write a comment...">
-                <button type="submit">Post</button>
+            <h4><i class="fas fa-comments"></i> Comments ({{ comments|length }})</h4>
+            
+            {% if current_user.is_authenticated %}
+            <form class="comment-form" action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+                <input type="text" name="content" placeholder="Write a comment..." required autocomplete="off">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Post</button>
             </form>
-            {% for comment in comments %}
-            <div class="comment">
-                <strong>@{{ comment['username'] }}</strong>
-                <p>{{ comment['content'] }}</p> 
-                <!--<small>{{ comment['created_at']}}</small>-->
-            </div>
             {% else %}
-            <p>No comments yet.</p>
-            {% endfor %}
+            <p style="text-align: center; padding: 16px 0; color: var(--text-muted);">
+                <a href="{{ url_for('login') }}" style="color: var(--brand);">Login</a> to comment
+            </p>
+            {% endif %}
+            
+            <div class="comments-list">
+                {% for comment in comments %}
+                <div class="comment" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <a href="{{ url_for('profile', username=comment.username) }}" class="comment-author">@{{ comment.username }}</a>
+                        <small>{{ comment.created_at | timeago }}</small>
+                        {% if current_user.is_authenticated and (current_user.id == comment.user_id or current_user.id == post.owner_id) %}
+                        <div class="comment-menu">
+                            <button class="comment-menu-trigger" data-menu-id="comment-menu-{{ comment.id }}" aria-label="Comment options">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="comment-menu-dropdown" id="comment-menu-{{ comment.id }}">
+                                <button type="button" class="edit-comment-btn" data-id="{{ comment.id }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST">
+                                    <button type="button" class="delete-comment-btn">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="comment-content-wrapper">
+                        <div id="comment-content-{{ comment.id }}" class="comment-content">
+                            <p>{{ comment.content | safe }}</p>
+                        </div>
+                        
+                        {% if current_user.is_authenticated and current_user.id == comment.user_id %}
+                        <form class="edit-comment-form is-hidden" id="edit-form-{{ comment.id }}" action="{{ url_for('edit_comment', comment_id=comment.id) }}" method="POST">
+                            <input type="text" name="content" value="{{ comment.content | striptags }}" required>
+                            <button type="submit"><i class="fas fa-save"></i> Save</button>
+                            <button type="button" class="cancel-edit" data-id="{{ comment.id }}"><i class="fas fa-times"></i> Cancel</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-comments">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>No comments yet. Be the first to comment!</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>

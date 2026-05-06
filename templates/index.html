@@ -1,60 +1,149 @@
 {% extends "base.html" %}
 
+{% block title %}Home - Social Gallery{% endblock %}
+
 {% block content %}
 <div class="feed">
+    <!-- Create Post Card -->
     {% if current_user.is_authenticated %}
-    <div class="card">
-        <div class="username">@{{ current_user.username }}</div>
-        <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-            <div class="post-box">
-                <input type="file" name="image" accept="image/*" required>
-                <input type="text" name="caption" placeholder="Write a caption...">
+    <div class="card create-post-card">
+        <div class="create-post-header">
+            <i class="fas fa-pen"></i> Create Post
+        </div>
+        
+        <form id="createPostForm" action="{{ url_for('create_post') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="content" id="postContent">
+            
+            <!-- Quill Editor -->
+            <div id="editor-container"></div>
+            <div class="char-counter" id="charCounter">0/500</div>
+            
+            <!-- Media Upload with Preview -->
+            <div class="media-preview is-hidden" id="mediaPreview"></div>
+            <div style="margin: 0 20px 20px;">
+                <label for="mediaInput" class="upload-btn">
+                    <i class="fas fa-image"></i> Add Image/GIF (Optional)
+                </label>
+                <input type="file" name="media" id="mediaInput" accept="image/*,video/*,image/gif" style="display: none;">
+                <span class="file-name" id="fileName" style="margin-left: 12px; font-size: 13px; color: var(--text-muted);"></span>
             </div>
-            <div class="actions">
-                <button type="submit">Post</button>
+            
+            <div class="post-actions" style="border-top: none;">
+                <button type="submit" class="action-btn submit-post-btn btn btn-primary" style="background: var(--brand); color: white;" disabled>
+                    <i class="fas fa-paper-plane"></i> Post
+                </button>
             </div>
         </form>
     </div>
     {% endif %}
-
+    
+    <!-- Posts Feed -->
     {% for post in posts %}
-    <div class="card">
-        <div class="username">
-            <a href="{{ url_for('profile', username=post['username']) }}">@{{ post['username'] }}</a>
+    <div class="card post-card" data-post-id="{{ post.id }}" data-post-type="{{ post.media_type }}">
+        <div class="card-header">
+            <div class="post-author">
+                <a href="{{ url_for('profile', username=post.username) }}">
+                    <div class="avatar">
+                        {% if post.avatar_filename %}
+                            <img src="{{ url_for('static', filename='uploads/avatars/' + post.avatar_filename) }}" alt="{{ post.username }}">
+                        {% else %}
+                            <div class="avatar-placeholder" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4f46e5);"></div>
+                        {% endif %}
+                    </div>
+                    <div class="post-author-info">
+                        <h4>@{{ post.username }}</h4>
+                        <time datetime="{{ post.created_at }}">{{ post.created_at | timeago }}</time>
+                    </div>
+                </a>
+            </div>
+            <div class="post-menu">
+                <button type="button" class="post-menu-trigger" data-menu-id="post-menu-{{ post.id }}">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="post-menu-dropdown" id="post-menu-{{ post.id }}">
+                    <a href="{{ url_for('view_post', post_id=post.id) }}">
+                        <i class="fas fa-external-link-alt"></i> Open post 
+                    </a>
+                    <a href="{{ url_for('profile', username=post.username) }}">
+                        <i class="fas fa-user"></i> View profile
+                    </a>
+                    {% if current_user.is_authenticated and current_user.id == post.owner_id %}
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                        <button type="button" class="delete-post-btn danger">
+                            <i class="fas fa-trash"></i> Delete post
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="post-box">
-            <a href="{{url_for('view_post', post_id=post['id'])}}">
-                <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
-            </a>
-            <div class="post-caption">{{ post['caption'] }}</div>
-        </div>
-        <div class="actions">
-            <button class="like-btn" data-id="{{ post['id'] }}">Like {{ post['like_count'] }}</button>
-            <button class="comment-btn" data-id="{{ post['id'] }}">Comment {{ post['comment_count'] }}</button>
-            <button class="save-btn {% if post['id'] in saved_posts %}saved{% endif %}" data-id="{{ post['id'] }}">
-                {% if post['id'] in saved_posts %}
-                    Saved
-                {% else %}
-                    Save
+        <!-- Clickable post content -->
+        <a href="{{ url_for('view_post', post_id=post.id) }}" class="post-content-link">
+            <div class="post-content">
+                {% if post.content %}
+                <div class="post-text">
+                    {{ post.content | safe }}
+                </div>
                 {% endif %}
+                
+                {% if post.media_filename %}
+                <div class="post-media">
+                    {% if post.media_type == 'image' %}
+                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post image" loading="lazy" class="lazy-image">
+                    {% elif post.media_type == 'gif' %}
+                    <div class="gif-container" data-gif-url="{{ url_for('static', filename='uploads/gifs/' + post.media_filename) }}">
+                        <img class="gif-placeholder" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="GIF preview">
+                        <button class="gif-play-btn"><i class="fas fa-play"></i> Play GIF</button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        
+        <div class="post-actions">
+            <button class="action-btn like-btn {% if post.id in liked_posts %}liked{% endif %}" data-id="{{ post.id }}">
+                <i class="{% if post.id in liked_posts %}fas{% else %}far{% endif %} fa-heart"></i>
+                <span class="like-count">{{ post.like_count }}</span>
             </button>
-            <!-- {% if current_user.is_authenticated and current_user.id == post['owner_id'] %}
-            <form action="{{ url_for('delete_post', post_id=post['id']) }}" method="POST">
-                <button type="submit" onclick="return confirm('Delete this post?')">Delete</button>
-            </form>
-            {% endif %} -->
+            <button class="action-btn comment-toggle" data-id="{{ post.id }}">
+                <i class="far fa-comment"></i>
+                <span class="comment-count">{{ post.comment_count }}</span>
+            </button>
+            <button class="action-btn save-btn {% if post.id in saved_posts %}saved{% endif %}" data-id="{{ post.id }}">
+                <i class="{% if post.id in saved_posts %}fas{% else %}far{% endif %} fa-bookmark"></i>
+                <span>{% if post.id in saved_posts %}Saved{% else %}Save{% endif %}</span>
+            </button>
         </div>
-        <div class="comments-section" id="comments-{{ post['id'] }}" style="display: none;">
-            <form action="{{ url_for('add_comment', post_id=post['id']) }}" method="POST">
-                <input type="text" name="content" placeholder="Write a comment...">
+        
+        <div class="comments-section is-hidden" id="comments-{{ post.id }}" data-owner="{{ post.owner_id }}">
+            <form class="comment-form" action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+                <input type="text" name="content" placeholder="Write a comment..." required autocomplete="off">
                 <button type="submit">Post</button>
             </form>
+            <div class="comments-list" id="comments-list-{{ post.id }}">
+                <!-- Comments will be loaded here -->
+            </div>
         </div>
     </div>
     {% else %}
-    <div class="card">
-        <p>No posts yet. Be the first to share!</p>
+    <div class="card empty-state" style="padding: 60px; text-align: center;">
+        <i class="fas fa-camera" style="font-size: 64px; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3>No posts yet</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">Be the first to share something!</p>
+        {% if current_user.is_authenticated %}
+            <a href="#" onclick="document.querySelector('.create-post-card').scrollIntoView({behavior: 'smooth'}); return false;" class="create-post-link">Create Post →</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="create-post-link">Login to post →</a>
+        {% endif %}
     </div>
     {% endfor %}
+    
+    <!-- Load more button - visible only if there are more posts (per_page=20) -->
+    {% if posts|length >= 20 %}
+    <div class="load-more-container" style="text-align: center; padding: 20px;">
+        <button id="loadMoreBtn" class="load-more-btn">Load more posts</button>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

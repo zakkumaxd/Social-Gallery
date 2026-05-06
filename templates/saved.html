@@ -1,18 +1,62 @@
 {% extends "base.html" %}
 
+{% block title %}Saved Posts - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="profile-container">
-    <h2>Saved Posts</h2>
+    <h2 style="margin-bottom: 20px;"><i class="fas fa-bookmark"></i> Saved Posts</h2>
+    
     <div class="posts-grid">
         {% for post in posts %}
         <div class="grid-card">
-            <img src="{{ url_for('static', filename='uploads/' + post['image_filename']) }}" alt="Post">
-            <div class="grid-actions">
-                <span>@{{ post['username'] }}</span>
+            <a href="{{ url_for('view_post', post_id=post.id) }}">
+                <div class="grid-media">
+                    {% if post.media_type == 'image' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/images/' + post.media_filename) }}" alt="Post" loading="lazy">
+                    {% elif post.media_type == 'video' and post.media_filename %}
+                        <video preload="metadata" poster="">
+                            <source src="{{ url_for('static', filename='uploads/videos/' + post.media_filename) }}" type="video/webm">
+                        </video>
+                    {% elif post.media_type == 'gif' and post.media_filename %}
+                        <img src="{{ url_for('static', filename='uploads/gifs/' + post.media_filename) }}" alt="GIF" loading="lazy">
+                    {% elif post.content %}
+                        <div class="text-preview">
+                            <i class="fas fa-file-alt"></i>
+                            <p>{{ post.preview|safe }}</p>
+                        </div>
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: var(--bg-tertiary); color: var(--text-muted);">
+                            <i class="fas fa-file-alt" style="font-size: 48px;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </a>
+            <div class="grid-info">
+                <a href="{{ url_for('profile', username=post.username) }}" style="color: var(--text-primary); text-decoration: none;">@{{ post.username }}</a>
+                <div class="post-menu">
+                    <button type="button" class="post-menu-trigger" data-menu-id="saved-post-menu-{{ post.id }}">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="post-menu-dropdown" id="saved-post-menu-{{ post.id }}">
+                        <a href="{{ url_for('view_post', post_id=post.id) }}">
+                            <i class="fas fa-external-link-alt"></i> View post
+                        </a>
+                        <button type="button" class="unsave-btn btn btn-outline" data-id="{{ post.id }}">
+                            <i class="fas fa-bookmark"></i> Unsave
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         {% else %}
-        <p>No saved posts yet.</p>
+        <div class="card text-center" style="grid-column: 1/-1; padding: 60px;">
+            <i class="fas fa-bookmark" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+            <p>No saved posts yet.</p>
+            <a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 16px; padding: 10px 24px; background: var(--brand); color: white; border-radius: var(--radius); text-decoration: none;">Browse posts →</a>
+        </div>
         {% endfor %}
     </div>
 </div>

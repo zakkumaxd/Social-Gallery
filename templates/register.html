@@ -1,17 +1,28 @@
 {% extends "base.html" %}
 
+{% block title %}Register - Social Gallery{% endblock %}
+
 {% block content %}
+<button class="back-btn-mobile" id="backBtnMobile" aria-label="Go back">
+    <i class="fas fa-arrow-left"></i>
+</button>
 <div class="auth-container">
-    <div class="card">
-        <h2>Register</h2>
+    <div class="card auth-card">
+        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+        
         <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="username" placeholder="Username (min 3 characters)" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password (min 6 characters)" required>
             <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <button type="submit">Sign up</button>
+            <button type="submit">
+                <i class="fas fa-check"></i> Sign Up
+            </button>
         </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        
+        <p style="margin-top: 20px; text-align: center;">
+            Already have an account? <a href="{{ url_for('login') }}" style="color: var(--brand);">Login</a>
+        </p>
     </div>
 </div>
 {% endblock %}
